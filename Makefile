@@ -293,22 +293,22 @@ ifeq ($(PLATFORM_OS),WINDOWS)
 endif
 
 ifeq ($(BUILD_MODE),RELEASE)
-	ifeq ($(PLATFORM_OS),WINDOWS)
+    ifeq ($(PLATFORM_OS),WINDOWS)
 		EMCC_SHELL = C:/raylib/raylib/src/shell_release.html
-	else
+    else
 		EMCC_SHELL = /home/littlej8/raylib/src/shell_release.html
-	endif
+    endif
 endif
 
 all:
 	$(MAKE) $(MAKEFILE_PARAMS)
 
 web: make_every_time
-	ifeq ($(PLATFORM_OS),WINDOWS)
+    ifeq ($(PLATFORM_OS),WINDOWS)
 		emcc -o web/index.html src/*.c -lraylib -Os -Wall C:/raylib/raylib/src/web/libraylib.a -I. -IC:/raylib/raylib/src/ -L. -LC:/raylib/raylib/src/web/ -s USE_GLFW=3 -s ASYNCIFY --shell-file $(EMCC_SHELL) -DPLATFORM_WEB
-	else
+    else
 		emcc -o web/index.html src/*.c -lraylib -Os -Wall /home/littlej8/raylib/src/web/libraylib.a -I. -I/usr/local/include/ -L. -L/home/littlej8/raylib/src/web/ -s USE_GLFW=3 -s ASYNCIFY --shell-file $(EMCC_SHELL) -DPLATFORM_WEB
-	endif
+    endif
 
 make_every_time: src/*.c
 	@echo Building project...

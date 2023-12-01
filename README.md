@@ -10,3 +10,5 @@ or on windows:
 ```
 mingw32-make PLATFORM=PLATFORM_DESKTOP
 ```
+
+Makefile was taken from a tutorial by Andrew Hamel and edited to fit the project

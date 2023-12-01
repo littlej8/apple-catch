@@ -26,12 +26,13 @@
 # Define required raylib variables
 PROJECT_NAME       ?= main
 RAYLIB_VERSION     ?= 4.5.0
-RAYLIB_PATH        ?= C:/raylib/raylib
-COMPILER_PATH      ?= C:/raylib/w64devkit/bin
+RAYLIB_PATH        ?= ~/raylib
+COMPILER_PATH      ?= /usr/bin/gcc
 BUILD_MODE         ?= DEBUG
-EXT				   ?= .exe
+EXT				   ?=
 PLATFORM           ?= PLATFORM_DESKTOP
 EXTRA			   ?= 
+PLATFORM_OS		   ?= LINUX
 # One of PLATFORM_DESKTOP, PLATFORM_RPI, PLATFORM_ANDROID, PLATFORM_WEB
 
 DESTDIR ?= /usr/local
@@ -40,6 +41,11 @@ RAYLIB_H_INSTALL_PATH ?= $(DESTDIR)/include
 RAYLIB_LIBTYPE        ?= STATIC
 USE_EXTERNAL_GLFW     ?= FALSE
 USE_WAYLAND_DISPLAY   ?= FALSE
+
+ifeq ($(PLATFORM_OS),WINDOWS)
+	RAYLIB_PATH = C:/raylib/raylib
+	COMPILER_PATH = C:/raylib/w64devkit/bin/gcc.exe
+endif
 
 ifeq ($(PLATFORM),PLATFORM_DESKTOP)
     ifeq ($(OS),Windows_NT)
@@ -92,7 +98,7 @@ ifeq ($(PLATFORM),PLATFORM_RPI)
 endif
 
 ifeq ($(PLATFORM),PLATFORM_WEB)
-    EMSDK_PATH          ?= C:/emsdk
+    EMSDK_PATH          ?= ~/emsdk
     EMSCRIPTEN_VERSION  ?= 1.38.31
     CLANG_VERSION       = e$(EMSCRIPTEN_VERSION)_64bit
     PYTHON_VERSION      = 2.7.13.1_64bit\python-2.7.13.amd64
@@ -280,10 +286,34 @@ else
     MAKEFILE_PARAMS = $(PROJECT_NAME)
 endif
 
+EMCC_SHELL ?= /home/littlej8/raylib/src/shell.html
+
+ifeq ($(PLATFORM_OS),WINDOWS)
+	EMCC_SHELL = C:/raylib/raylib/src/shell.html
+endif
+
+ifeq ($(BUILD_MODE),RELEASE)
+	ifeq ($(PLATFORM_OS),WINDOWS)
+		EMCC_SHELL = C:/raylib/raylib/src/shell_release.html
+	else
+		EMCC_SHELL = /home/littlej8/raylib/src/shell_release.html
+	endif
+endif
+
 all:
 	$(MAKE) $(MAKEFILE_PARAMS)
 
-$(PROJECT_NAME): $(OBJS)
+web: make_every_time
+	ifeq ($(PLATFORM_OS),WINDOWS)
+		emcc -o web/index.html src/*.c -lraylib -Os -Wall C:/raylib/raylib/src/web/libraylib.a -I. -IC:/raylib/raylib/src/ -L. -LC:/raylib/raylib/src/web/ -s USE_GLFW=3 -s ASYNCIFY --shell-file $(EMCC_SHELL) -DPLATFORM_WEB
+	else
+		emcc -o web/index.html src/*.c -lraylib -Os -Wall /home/littlej8/raylib/src/web/libraylib.a -I. -I/usr/local/include/ -L. -L/home/littlej8/raylib/src/web/ -s USE_GLFW=3 -s ASYNCIFY --shell-file $(EMCC_SHELL) -DPLATFORM_WEB
+	endif
+
+make_every_time: src/*.c
+	@echo Building project...
+
+$(PROJECT_NAME): $(OBJS) make_every_time
 	$(CC) -o $(PROJECT_NAME)$(EXT) $(OBJS) $(CFLAGS) $(INCLUDE_PATHS) $(LDFLAGS) $(LDLIBS) -D$(PLATFORM)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
@@ -309,4 +339,3 @@ ifeq ($(PLATFORM),PLATFORM_WEB)
 	del *.o *.html *.js
 endif
 	@echo Cleaning done
-

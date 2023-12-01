@@ -1,3 +1,7 @@
 main
-obj/*
 *.exe
+obj
+web
+win
+.vscode
+main.code-workspace

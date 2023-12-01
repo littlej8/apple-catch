@@ -2,7 +2,7 @@
 a game made in raylib about catching apples
 
 # build
-build with this command:
+build with this command (you probably have to update file paths in the Makefile first):
 ```
 make PLATFORM=PLATFORM_DESKTOP
 ```

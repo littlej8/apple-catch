@@ -10,5 +10,10 @@ or on windows:
 ```
 mingw32-make PLATFORM=PLATFORM_DESKTOP
 ```
+or for the web:
+```
+make web
+```
+append ```BUILD_MODE=RELEASE``` to any of the commands to build for release
 
 Makefile was taken from a tutorial by Andrew Hamel and edited to fit the project
